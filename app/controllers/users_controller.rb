@@ -50,8 +50,10 @@ class UsersController < ApplicationController
             href: user_params['href'])
             # update the access and refresh tokens in the db
             @user.update(access_token: auth_params['access_token'], refresh_token: auth_params['refresh_token'])
+            
+            @user.fetch_playlists
+            
             # redirect user to main page
-
             # FIXME: update to the correct route
             redirect_to 'http://localhost:3000/user'
         end

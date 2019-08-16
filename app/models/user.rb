@@ -12,28 +12,31 @@ class User < ApplicationRecord
     end
 
     def get_refresh_token
-        byebug
-        # TODO: find the current user ... using cookies?!
-        # current_user = User.first
-        
-        # Check if user's access token has expired
-        if current_user.access_token_expired?
-            # request new access token using refresh token
-            # create body of request
-            body = {
-                grant_type: 'refresh_token',
-                refresh_token: current_user.refresh_token,
-                client_id: ENV['CLIENT_ID'],
-                client_secret: ENV['CLIENT_SECRET']
-            }
-            # send the request and update the user's access token
-            auth_response = RestClient.post('https://accounts.spotify.com/api/token', body)
-            auth_params = JSON.parse(auth_response)
-            current_user.update(access_token: auth_params['access_token'])
-        end
+        # request new access token using refresh token
+        # create body of request
+        body = {
+            grant_type: 'refresh_token',
+            refresh_token: self.refresh_token,
+            client_id: ENV['CLIENT_ID'],
+            client_secret: ENV['CLIENT_SECRET']
+        }
+        # send the request and update the user's access token
+        auth_response = RestClient.post('https://accounts.spotify.com/api/token', body)
+        auth_params = JSON.parse(auth_response)
+        self.update(access_token: auth_params['access_token'])
     end
 
-    def get_songs
+    def fetch_spotify_data
+        if self.access_token_expired?
+            self.get_refresh_token
+        end
+
+        self.fetch_library
+        self.fetch_playlists
+    end
+
+    def fetch_library
+
         token = self.access_token
         header = {
             Authorization: "Bearer #{token}"
@@ -45,6 +48,10 @@ class User < ApplicationRecord
         # convert response.body to json 
         library_params = JSON.parse(library_response.body)
         total_tracks = library_params['total']
+
+        # Create a new library playlist for relating the user's songs that are not associated with a Spotify playist
+        library_playlist = Playlist.create(user_id: self.id, name: "#{self.username} - Library")
+
         songs = library_params['items']
         songs.each do |song|
             song = song['track']
@@ -73,6 +80,8 @@ class User < ApplicationRecord
             tempo = track_params['tempo']
 
             @new_song.update(name: name, duration_ms: duration_ms, href: href, popularity: popularity,danceability: danceability, key: key, acousticness: acousticness, energy: energy, instrumentalness: instrumentalness, liveness: liveness, loudness: loudness, speechiness: speechiness, valence: valence, tempo: tempo)
+
+            library_playlist.songs << @new_song
         end
     end
 
