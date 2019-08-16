@@ -11,9 +11,10 @@ class User < ApplicationRecord
         (Time.now - self.updated_at) > 3300
     end
 
-    def refresh_token
+    def get_refresh_token
+        byebug
         # TODO: find the current user ... using cookies?!
-        current_user = User.first
+        # current_user = User.first
         
         # Check if user's access token has expired
         if current_user.access_token_expired?

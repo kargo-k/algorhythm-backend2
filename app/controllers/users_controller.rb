@@ -6,10 +6,11 @@ class UsersController < ApplicationController
 
     def login
         # requests the user to authorize linking to their spotify account
+        byebug
         query_params = {
             client_id: ENV['CLIENT_ID'],
             response_type: "code",
-            redirect_uri: "#{BACKEND_URL}/callback",
+            # redirect_uri: "#{BACKEND_URL}/callback",
             scope: "user-library-read playlist-read-collaborative playlist-modify-private playlist-modify-public playlist-read-private user-top-read",
             show_dialog: true
         }
@@ -19,6 +20,7 @@ class UsersController < ApplicationController
     end
 
     def callback
+        byebug
         if params[:error]
             # return error if there is one
             puts 'LOGIN ERROR', params
@@ -58,6 +60,7 @@ class UsersController < ApplicationController
     end
 
     def loginFailure
+        byebug
         puts 'login failure here'
         redirect_to "#{BACKEND_URL}/error"
     end
@@ -68,6 +71,7 @@ class UsersController < ApplicationController
     end
 
     def show
+        byebug
         user = User.find(params[:id])
         render json: user
     end
