@@ -86,6 +86,11 @@ class User < ApplicationRecord
     end
 
     def fetch_playlists
+
+        if self.access_token_expired?
+            self.get_refresh_token
+        end
+
         token = self.access_token
         header = {
             Authorization: "Bearer #{token}"
@@ -110,7 +115,6 @@ class User < ApplicationRecord
 
             newplaylist.update(user_id: user_id, name: name, href: href, total_tracks: total_tracks)
 
-            newplaylist.fetch_songs(token)
         end
     end
 end
