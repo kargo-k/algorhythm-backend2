@@ -51,7 +51,8 @@ class UsersController < ApplicationController
             # update the access and refresh tokens in the db
             @user.update(access_token: auth_params['access_token'], refresh_token: auth_params['refresh_token'])
             
-            @user.fetch_playlists
+            # fetches user's spotify data to save into the db
+            @user.fetch_spotify_data
             
             # redirect user to main page
             # FIXME: update to the correct route
