@@ -1,10 +1,10 @@
 class PlaylistsController < ApplicationController
-    before_action :set_user
+    # before_action :set_user
 
     def index
-        byebug
         # returns only the current user's playlists
-        playlists = current_user.playlists
+        # playlists = current_user.playlists
+        playlists = Playlist.all
         render json: playlists
     end
 
@@ -19,7 +19,6 @@ class PlaylistsController < ApplicationController
     private
 
     def set_user
-        byebug
         # sets the current user using id before any actions
         current_user = User.find(params[:user_id])
         byebug
