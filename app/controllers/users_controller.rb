@@ -1,5 +1,4 @@
 class UsersController < ApplicationController
-    before_action :set_user
     
     BACKEND_URL = 'http://localhost:8888'
     FRONTEND_URL = 'http://localhost:3000'
@@ -60,29 +59,25 @@ class UsersController < ApplicationController
             end
                 
             # pass back the access token to the front end
-            redirect_to "http://localhost:3000/user?#{@user.access_token}"
+            redirect_to "http://localhost:3000/user?token=#{@user.access_token}"
         end
     end
     
     def loginFailure
         puts 'login failure here'
-        redirect_to "#{BACKEND_URL}/error"
-    end
-    
-    def index
-        users = User.find(session[:user_id])
-        render json: users
+        redirect_to "#{FRONTEND_URL}/error"
     end
 
-    def show
-        user = User.find(params[:id])
-        render json: user
+    def index
+        current_user = User.find_by(access_token: params[:token])
+        byebug
+        render json: current_user
     end
 
     private
     
         def set_user
-            current_user = User.find(session[:user_id])
+            
         end
 
 end
