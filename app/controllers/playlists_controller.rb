@@ -3,7 +3,7 @@ class PlaylistsController < ApplicationController
 
     def index
         # returns only the current user's playlists
-        current_user = User.find_by(access_token: params[:access_token])
+        current_user = User.find_by(access_token: params[:token])
         playlists = current_user.playlists
         render json: playlists
     end

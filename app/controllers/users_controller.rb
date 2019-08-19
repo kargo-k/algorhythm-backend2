@@ -70,7 +70,6 @@ class UsersController < ApplicationController
 
     def index
         current_user = User.find_by(access_token: params[:token])
-        byebug
         render json: current_user
     end
 
