@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-
+    
     BACKEND_URL = 'http://localhost:8888'
     FRONTEND_URL = 'http://localhost:3000'
     SPOTIFY_API = 'https://api.spotify.com/v1'
@@ -9,7 +9,7 @@ class UsersController < ApplicationController
         query_params = {
             client_id: ENV['CLIENT_ID'],
             response_type: "code",
-            # redirect_uri: "#{BACKEND_URL}/callback",
+            redirect_uri: "#{BACKEND_URL}/callback",
             scope: "user-library-read playlist-read-collaborative playlist-modify-private playlist-modify-public playlist-read-private user-top-read",
             show_dialog: true
         }
@@ -17,7 +17,7 @@ class UsersController < ApplicationController
         # redirects user's browser to Spotify's authorization page, which details scopes the app is requestiong
         redirect_to "#{url}?#{query_params.to_query}"
     end
-
+    
     def callback
         if params[:error]
             # return error if there is one
@@ -40,39 +40,43 @@ class UsersController < ApplicationController
             header = {
                 Authorization: "Bearer #{auth_params['access_token']}"
             }
-            #! using the endpoint to get the user data
+
             user_response = RestClient.get("#{SPOTIFY_API}/me", header)
             # convert response.body to json fro assignment
             user_params = JSON.parse(user_response.body)
-            # Create new user based on response, or find the existing user in database
-            @user = User.find_or_create_by(username: user_params['display_name'],
-            spotify_id: user_params['id'],
-            href: user_params['href'])
-            # update the access and refresh tokens in the db
-            @user.update(access_token: auth_params['access_token'], refresh_token: auth_params['refresh_token'])
             
-            # fetches user's spotify data to save into the db
-            @user.fetch_spotify_data
-            
-            # redirect user to main page
-            # FIXME: update to the correct route
-            redirect_to 'http://localhost:3000/user'
+            # If the user already exists, set @user to the user, else create a new User
+            if User.find_by(username: user_params['display_name'])
+                @user = User.find_by(username: user_params['display_name'])
+            else
+                @user = User.create(
+                    username: user_params['display_name'],
+                    spotify_id: user_params['id'],
+                    href: user_params['href'])
+                @user.update(access_token: auth_params['access_token'], refresh_token: auth_params['refresh_token'])
+                # fetch user's playlists
+                @user.fetch_playlists
+            end
+                
+            # pass back the access token to the front end
+            redirect_to "http://localhost:3000/user?token=#{@user.access_token}"
         end
     end
-
+    
     def loginFailure
         puts 'login failure here'
-        redirect_to "#{BACKEND_URL}/error"
+        redirect_to "#{FRONTEND_URL}/error"
     end
 
     def index
-        users = User.all
-        render json: users
+        current_user = User.find_by(access_token: params[:token])
+        render json: current_user
     end
 
-    def show
-        user = User.find(params[:id])
-        render json: user
-    end
+    private
+    
+        def set_user
+            
+        end
 
 end
