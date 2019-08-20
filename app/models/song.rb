@@ -49,4 +49,5 @@ class Song < ApplicationRecord
             @new_song.update(name: name, duration_ms: duration_ms, href: href, popularity: popularity,danceability: danceability, key: key, acousticness: acousticness, energy: energy, instrumentalness: instrumentalness, liveness: liveness, loudness: loudness, speechiness: speechiness, valence: valence, tempo: tempo)
         end
     end
+
 end

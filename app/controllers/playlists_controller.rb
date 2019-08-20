@@ -10,8 +10,25 @@ class PlaylistsController < ApplicationController
 
     def show
         playlist = Playlist.find(params[:id])
-        newplaylist.fetch_songs(token)
+        playlist.fetch_songs(params[:token])
         render json: {playlist: playlist, songs: playlist.songs}
+    end
+
+    def new
+        # getting the parameters from the front end
+        popularity = params[:popularity]
+        key = params[:key]
+        acousticness = params[:acousticness]
+        danceability = params[:danceability]
+        energy = params[:energy]
+        instrumentalness = params[:instrumentalness]
+        liveness = params[:liveness]
+        loudness = params[:loudness]
+        speechiness = params[:speechiness]
+        valence = params[:valence]
+        tempo = params[:tempo]
+
+
     end
     
     private
@@ -20,4 +37,5 @@ class PlaylistsController < ApplicationController
         # sets the current user using id before any actions
         current_user = User.find_by(access_token: params[:access_token])
     end
+
 end
