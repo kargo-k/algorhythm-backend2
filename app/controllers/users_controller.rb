@@ -56,6 +56,7 @@ class UsersController < ApplicationController
                 @user.update(access_token: auth_params['access_token'], refresh_token: auth_params['refresh_token'])
                 # fetch user's playlists
                 @user.fetch_playlists
+                @user.fetch_library
             end
                 
             # pass back the access token to the front end
