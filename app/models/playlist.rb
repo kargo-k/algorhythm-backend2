@@ -50,4 +50,15 @@ class Playlist < ApplicationRecord
             self.songs << @new_song
         end
     end
+
+    def energy(level)
+        min_range = level - 0.125
+        min_range < 0 ? min_range = 0 : min_range
+        max_range = level + 0.125
+        max_range > 1 ? max_range = 1 : max_range
+
+        # filter songs based on energy level
+
+    end
+
 end
