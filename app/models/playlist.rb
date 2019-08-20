@@ -1,13 +1,14 @@
 class Playlist < ApplicationRecord
     belongs_to :user
     has_and_belongs_to_many :songs
-    has_many :artists, :through => :songs
+    # has_many :artists, :through => :songs
     
     BACKEND_URL = 'http://localhost:8888'
     FRONTEND_URL = 'http://localhost:3000'
     SPOTIFY_API = 'https://api.spotify.com/v1'
 
     def fetch_songs(token)
+
         header = {Authorization: "Bearer #{token}"}
 
         #! using the endpoint to get playlist's tracks
@@ -17,7 +18,14 @@ class Playlist < ApplicationRecord
         tracks_params = JSON.parse(tracks_response.body)
         songs = tracks_params['tracks']['items']
 
-        songs.each do |song|
+        self.save_songs(songs, token)
+
+    end
+
+    def save_songs(array, token)
+        
+        header = {Authorization: "Bearer #{token}"}
+        array.each do |song|
 
             song = song['track']
             spotify_id = song['id']
