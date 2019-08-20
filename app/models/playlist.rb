@@ -8,9 +8,7 @@ class Playlist < ApplicationRecord
     SPOTIFY_API = 'https://api.spotify.com/v1'
 
     def fetch_songs(token)
-        header = {
-            Authorization: "Bearer #{token}"
-        }
+        header = {Authorization: "Bearer #{token}"}
 
         #! using the endpoint to get playlist's tracks
         tracks_response = RestClient.get(self.href, header)
@@ -20,15 +18,23 @@ class Playlist < ApplicationRecord
         songs = tracks_params['tracks']['items']
 
         songs.each do |song|
+
+            song = song['track']
             spotify_id = song['id']
 
-            @song = !Song.find_by(spotify_id: spotify_id) ?
+            @target_song = Song.find_by(spotify_id: spotify_id) 
+            
+            !@target_song ?
             # if the song not found in the database, create a new song
-                (song = song['track']
-                name = song['name']
+                (name = song['name']
                 duration_ms = song['duration_ms']
                 href = song['href']
                 popularity = song['popularity']
+                img = song['album']['images'][1]['url']
+                artist_array = []
+                song['artists'].each{|artist| artist_array << artist['name']}
+                artist_array = artist_array.join(', ')
+                uri = song['uri']
 
                 # doing another fetch for audio features
                 #! using the endpoint to get the track's audio features
@@ -47,12 +53,13 @@ class Playlist < ApplicationRecord
                 valence = track_params['valence']
                 tempo = track_params['tempo']
 
-                @song = Song.create(name: name, duration_ms: duration_ms, href: href, popularity: popularity,danceability: danceability, key: key, acousticness: acousticness, energy: energy, instrumentalness: instrumentalness, liveness: liveness, loudness: loudness, speechiness: speechiness, valence: valence, tempo: tempo)
+                @target_song = Song.create(name: name, duration_ms: duration_ms, href: href, popularity: popularity,danceability: danceability, key: key, acousticness: acousticness, energy: energy, instrumentalness: instrumentalness, liveness: liveness, loudness: loudness, speechiness: speechiness, valence: valence, tempo: tempo, img: img, uri: uri)
 
-                self.songs << @song)
-            :   @song
+                self.songs << @target_song)
+            :   @target_song
         end
     end
+
 
     def energy(level)
         min_range = level - 0.125
