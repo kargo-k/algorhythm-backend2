@@ -9,6 +9,11 @@ class Playlist < ApplicationRecord
 
     def fetch_songs(token)
 
+        current_user = User.find_by(access_token: token)
+        if current_user.access_token_expired?
+            current_user.update_token
+        end
+
         header = {Authorization: "Bearer #{token}"}
 
         #! using the endpoint to get playlist's tracks

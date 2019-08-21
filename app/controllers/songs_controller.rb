@@ -3,7 +3,7 @@ class SongsController < ApplicationController
 
     def index
         # returns only the current users songs
-        current_user = User.find_by(access_token: params[:access_token])
+        current_user = User.find_by(access_token: params[:token])
         songs = current_user.songs
         render json: songs
     end
@@ -17,7 +17,7 @@ class SongsController < ApplicationController
 
     def set_user
         # sets the current user using id before any actions
-        current_user = User.find_by(access_token: params[:access_token])
+        current_user = User.find_by(access_token: params[:token])
     end
     
 end
