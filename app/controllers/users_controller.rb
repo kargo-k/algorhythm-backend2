@@ -10,7 +10,14 @@ class UsersController < ApplicationController
             client_id: ENV['CLIENT_ID'],
             response_type: "code",
             redirect_uri: "#{BACKEND_URL}/callback",
-            scope: "user-library-read playlist-read-collaborative playlist-modify-private playlist-modify-public playlist-read-private user-top-read streaming user-read-email",
+            scope: "user-library-read 
+                    playlist-read-collaborative 
+                    playlist-modify-private 
+                    playlist-modify-public 
+                    playlist-read-private 
+                    user-top-read 
+                    streaming 
+                    user-read-email",
             show_dialog: true
         }
         url = 'https://accounts.spotify.com/authorize/'
@@ -52,6 +59,7 @@ class UsersController < ApplicationController
                     @user.update_token
                 end
             else
+                byebug
                 @user = User.create(
                     username: user_params['display_name'],
                     spotify_id: user_params['id'],
