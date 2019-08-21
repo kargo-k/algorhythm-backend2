@@ -44,7 +44,7 @@ class User < ApplicationRecord
         token = self.access_token
         header = {Authorization: "Bearer #{token}"}
         #! using the endpoint to get the user's library of tracks
-        library_response = RestClient.get("#{SPOTIFY_API}/me/tracks?limit=20", header)
+        library_response = RestClient.get("#{SPOTIFY_API}/me/tracks?limit=50", header)
         # max limit is 50
         
         # convert response.body to json 
@@ -65,11 +65,9 @@ class User < ApplicationRecord
         end
 
         token = self.access_token
-        header = {
-            Authorization: "Bearer #{token}"
-        }
+        header = { Authorization: "Bearer #{token}" }
         #! using the endpoint to get the user's playists
-        playlists_response = RestClient.get("#{SPOTIFY_API}/me/playlists?limit=5", header)
+        playlists_response = RestClient.get("#{SPOTIFY_API}/me/playlists?limit=50", header)
         # max limit is 50
         
         # convert response.body to json 

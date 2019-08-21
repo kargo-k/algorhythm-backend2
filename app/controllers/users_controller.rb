@@ -10,7 +10,7 @@ class UsersController < ApplicationController
             client_id: ENV['CLIENT_ID'],
             response_type: "code",
             redirect_uri: "#{BACKEND_URL}/callback",
-            scope: "user-library-read playlist-read-collaborative playlist-modify-private playlist-modify-public playlist-read-private user-top-read",
+            scope: "user-library-read playlist-read-collaborative playlist-modify-private playlist-modify-public playlist-read-private user-top-read streaming user-read-email",
             show_dialog: true
         }
         url = 'https://accounts.spotify.com/authorize/'
@@ -48,16 +48,19 @@ class UsersController < ApplicationController
             # If the user already exists, set @user to the user, else create a new User
             if User.find_by(username: user_params['display_name'])
                 @user = User.find_by(username: user_params['display_name'])
+                if @user.access_token_expired?
+                    @user.update_token
+                end
             else
                 @user = User.create(
                     username: user_params['display_name'],
                     spotify_id: user_params['id'],
                     href: user_params['href'])
                 @user.update(access_token: auth_params['access_token'], refresh_token: auth_params['refresh_token'])
-                # fetch user's playlists
-                @user.fetch_playlists
-                @user.fetch_library
             end
+            # fetch user's playlists
+            @user.fetch_playlists
+            @user.fetch_library
                 
             # pass back the access token to the front end
             redirect_to "http://localhost:3000/user?token=#{@user.access_token}"
