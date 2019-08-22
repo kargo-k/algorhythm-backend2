@@ -59,7 +59,6 @@ class UsersController < ApplicationController
                     @user.update_token
                 end
             else
-                byebug
                 @user = User.create(
                     username: user_params['display_name'],
                     spotify_id: user_params['id'],
