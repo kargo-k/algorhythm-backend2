@@ -8,7 +8,6 @@ class Playlist < ApplicationRecord
     SPOTIFY_API = 'https://api.spotify.com/v1'
 
     def fetch_songs(token)
-
         current_user = User.find_by(access_token: token)
         if current_user.access_token_expired?
             current_user.update_token
