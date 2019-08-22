@@ -69,6 +69,7 @@ class PlaylistsController < ApplicationController
         songs_array = params[:uris]
         songs_array.each{|song| playlist.songs << Song.find_by(uri: song)}
 
+        render json: playlist
     end
     
     private
